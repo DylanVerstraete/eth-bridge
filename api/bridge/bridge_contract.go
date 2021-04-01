@@ -295,46 +295,12 @@ func (w WithdrawEvent) BlockHeight() uint64 {
 	return w.blockHeight
 }
 
-// GetPastWithdraws gets a list of past withdraw events between two block numbers
-func (bridge *BridgeContract) GetPastWithdraws(startHeight uint64, endHeight *uint64) ([]WithdrawEvent, error) {
-	filterOpts := &bind.FilterOpts{Context: context.Background(), Start: startHeight, End: endHeight}
-	iterator, err := bridge.filter.FilterWithdraw(filterOpts, nil)
-	for IsNoPeerErr(err) {
-		time.Sleep(time.Second * 5)
-		log.Debug("Retrying fetching past withdraws")
-		iterator, err = bridge.filter.FilterWithdraw(filterOpts, nil)
-	}
-	if err != nil {
-		log.Error("Creating past withdraw event iterator failed", "err", err)
-		return nil, err
-	}
-
-	var withdraws []WithdrawEvent
-	for iterator.Next() {
-		withdraw := iterator.Event
-		if withdraw.Raw.Removed {
-			continue
-		}
-		withdraws = append(withdraws, WithdrawEvent{receiver: withdraw.Receiver, amount: withdraw.Tokens, txHash: withdraw.Raw.TxHash, blockHash: withdraw.Raw.BlockHash, blockHeight: withdraw.Raw.BlockNumber})
-	}
-	// Make sure to check the iterator for errors
-	return withdraws, iterator.Error()
-}
-
 // SubscribeWithdraw subscribes to new Withdraw events on the given contract. This call blocks
 // and prints out info about any withdraw as it happened
 func (bridge *BridgeContract) SubscribeWithdraw(wc chan<- WithdrawEvent, startHeight uint64) error {
 	log.Debug("Subscribing to withdraw events", "start height", startHeight)
 	sink := make(chan *contract.TokenWithdraw)
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	pastWithdraws, err := bridge.GetPastWithdraws(startHeight, nil)
-	if err != nil {
-		return err
-	}
-	for _, w := range pastWithdraws {
-		// notify about all the past withdraws
-		wc <- w
-	}
 	sub, err := bridge.WatchWithdraw(watchOpts, sink, nil)
 	if err != nil {
 		log.Error("Subscribing to withdraw events failed", "err", err)
@@ -404,26 +370,6 @@ func (bridge *BridgeContract) WatchWithdraw(opts *bind.WatchOpts, sink chan<- *c
 			}
 		}
 	}), nil
-}
-
-// SubscribeRegisterWithdrawAddress subscribes to new RegisterWithdrawalAddress events on the given contract. This call blocks
-// and prints out info about any RegisterWithdrawalAddress event as it happened
-func (bridge *BridgeContract) SubscribeRegisterWithdrawAddress() error {
-	sink := make(chan *contract.TokenRegisterWithdrawalAddress)
-	opts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	sub, err := bridge.filter.WatchRegisterWithdrawalAddress(opts, sink, nil)
-	if err != nil {
-		return err
-	}
-	defer sub.Unsubscribe()
-	for {
-		select {
-		case err = <-sub.Err():
-			return err
-		case withdraw := <-sink:
-			log.Debug("Noticed withdraw address registration event", "address", withdraw.Addr)
-		}
-	}
 }
 
 // TransferFunds transfers funds from one address to another
@@ -507,49 +453,6 @@ func (bridge *BridgeContract) isMintTxID(txID string) (bool, error) {
 	defer cancel()
 	opts := &bind.CallOpts{Context: ctx}
 	return bridge.caller.IsMintID(opts, txID)
-}
-
-func (bridge *BridgeContract) RegisterWithdrawalAddress(address ERC20Address) error {
-	err := bridge.registerWithdrawalAddress(address)
-	for IsNoPeerErr(err) {
-		time.Sleep(retryDelay)
-		err = bridge.registerWithdrawalAddress(address)
-	}
-	return err
-}
-
-func (bridge *BridgeContract) registerWithdrawalAddress(address ERC20Address) error {
-	log.Debug("Calling register withdrawal address function in contract")
-	accountAddress, err := bridge.lc.AccountAddress()
-	if err != nil {
-		return err
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-	defer cancel()
-	opts := &bind.TransactOpts{
-		Context: ctx, From: accountAddress,
-		Signer: bridge.getSignerFunc(),
-		Value:  nil, Nonce: nil, GasLimit: 0, GasPrice: nil,
-	}
-	_, err = bridge.transactor.RegisterWithdrawalAddress(opts, common.Address(address))
-	return err
-}
-
-func (bridge *BridgeContract) IsWithdrawalAddress(address ERC20Address) (bool, error) {
-	success, err := bridge.isWithdrawalAddress(address)
-	for IsNoPeerErr(err) {
-		time.Sleep(retryDelay)
-		success, err = bridge.isWithdrawalAddress(address)
-	}
-	return success, err
-}
-
-func (bridge *BridgeContract) isWithdrawalAddress(address ERC20Address) (bool, error) {
-	log.Debug("Calling isWithdrawalAddress function in contract")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
-	defer cancel()
-	opts := &bind.CallOpts{Context: ctx}
-	return bridge.caller.IsWithdrawalAddress(opts, common.Address(address))
 }
 
 func (bridge *BridgeContract) getSignerFunc() bind.SignerFn {

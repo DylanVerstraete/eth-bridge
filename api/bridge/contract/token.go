@@ -28,7 +28,7 @@ var (
 )
 
 // TokenABI is the input ABI used to generate the binding from.
-const TokenABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"AddedOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"string\",\"name\":\"txid\",\"type\":\"string\"}],\"name\":\"Mint\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"RegisterWithdrawalAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"removedOwner\",\"type\":\"address\"}],\"name\":\"RemovedOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"string\",\"name\":\"version\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"Withdraw\",\"type\":\"event\"},{\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"}],\"name\":\"addOwner\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenOwner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"string\",\"name\":\"_txid\",\"type\":\"string\"}],\"name\":\"isMintID\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"isWithdrawalAddress\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"txid\",\"type\":\"string\"}],\"name\":\"mintTokens\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"registerWithdrawalAddress\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_toRemove\",\"type\":\"address\"}],\"name\":\"removeOwner\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"string\",\"name\":\"_version\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"_implementation\",\"type\":\"address\"}],\"name\":\"upgradeTo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const TokenABI = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"AddedOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"string\",\"name\":\"txid\",\"type\":\"string\"}],\"name\":\"Mint\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"removedOwner\",\"type\":\"address\"}],\"name\":\"RemovedOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"string\",\"name\":\"version\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"string\",\"name\":\"blockchain_address\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"string\",\"name\":\"network\",\"type\":\"string\"}],\"name\":\"Withdraw\",\"type\":\"event\"},{\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"}],\"name\":\"addOwner\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenOwner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"implementation\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"string\",\"name\":\"_txid\",\"type\":\"string\"}],\"name\":\"isMintID\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"txid\",\"type\":\"string\"}],\"name\":\"mintTokens\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_toRemove\",\"type\":\"address\"}],\"name\":\"removeOwner\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"string\",\"name\":\"_version\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"_implementation\",\"type\":\"address\"}],\"name\":\"upgradeTo\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokens\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"blockchain_address\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"network\",\"type\":\"string\"}],\"name\":\"withdraw\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // Token is an auto generated Go binding around an Ethereum contract.
 type Token struct {
@@ -302,32 +302,6 @@ func (_Token *TokenCallerSession) IsMintID(_txid string) (bool, error) {
 	return _Token.Contract.IsMintID(&_Token.CallOpts, _txid)
 }
 
-// IsWithdrawalAddress is a free data retrieval call binding the contract method 0x206a943c.
-//
-// Solidity: function isWithdrawalAddress(address _addr) view returns(bool)
-func (_Token *TokenCaller) IsWithdrawalAddress(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Token.contract.Call(opts, out, "isWithdrawalAddress", _addr)
-	return *ret0, err
-}
-
-// IsWithdrawalAddress is a free data retrieval call binding the contract method 0x206a943c.
-//
-// Solidity: function isWithdrawalAddress(address _addr) view returns(bool)
-func (_Token *TokenSession) IsWithdrawalAddress(_addr common.Address) (bool, error) {
-	return _Token.Contract.IsWithdrawalAddress(&_Token.CallOpts, _addr)
-}
-
-// IsWithdrawalAddress is a free data retrieval call binding the contract method 0x206a943c.
-//
-// Solidity: function isWithdrawalAddress(address _addr) view returns(bool)
-func (_Token *TokenCallerSession) IsWithdrawalAddress(_addr common.Address) (bool, error) {
-	return _Token.Contract.IsWithdrawalAddress(&_Token.CallOpts, _addr)
-}
-
 // Name is a free data retrieval call binding the contract method 0x06fdde03.
 //
 // Solidity: function name() view returns(string)
@@ -495,27 +469,6 @@ func (_Token *TokenTransactorSession) MintTokens(receiver common.Address, tokens
 	return _Token.Contract.MintTokens(&_Token.TransactOpts, receiver, tokens, txid)
 }
 
-// RegisterWithdrawalAddress is a paid mutator transaction binding the contract method 0x34ca6a71.
-//
-// Solidity: function registerWithdrawalAddress(address addr) returns()
-func (_Token *TokenTransactor) RegisterWithdrawalAddress(opts *bind.TransactOpts, addr common.Address) (*types.Transaction, error) {
-	return _Token.contract.Transact(opts, "registerWithdrawalAddress", addr)
-}
-
-// RegisterWithdrawalAddress is a paid mutator transaction binding the contract method 0x34ca6a71.
-//
-// Solidity: function registerWithdrawalAddress(address addr) returns()
-func (_Token *TokenSession) RegisterWithdrawalAddress(addr common.Address) (*types.Transaction, error) {
-	return _Token.Contract.RegisterWithdrawalAddress(&_Token.TransactOpts, addr)
-}
-
-// RegisterWithdrawalAddress is a paid mutator transaction binding the contract method 0x34ca6a71.
-//
-// Solidity: function registerWithdrawalAddress(address addr) returns()
-func (_Token *TokenTransactorSession) RegisterWithdrawalAddress(addr common.Address) (*types.Transaction, error) {
-	return _Token.Contract.RegisterWithdrawalAddress(&_Token.TransactOpts, addr)
-}
-
 // RemoveOwner is a paid mutator transaction binding the contract method 0x173825d9.
 //
 // Solidity: function removeOwner(address _toRemove) returns()
@@ -598,6 +551,27 @@ func (_Token *TokenSession) UpgradeTo(_version string, _implementation common.Ad
 // Solidity: function upgradeTo(string _version, address _implementation) returns()
 func (_Token *TokenTransactorSession) UpgradeTo(_version string, _implementation common.Address) (*types.Transaction, error) {
 	return _Token.Contract.UpgradeTo(&_Token.TransactOpts, _version, _implementation)
+}
+
+// Withdraw is a paid mutator transaction binding the contract method 0x9a493e75.
+//
+// Solidity: function withdraw(uint256 tokens, string blockchain_address, string network) returns(bool success)
+func (_Token *TokenTransactor) Withdraw(opts *bind.TransactOpts, tokens *big.Int, blockchain_address string, network string) (*types.Transaction, error) {
+	return _Token.contract.Transact(opts, "withdraw", tokens, blockchain_address, network)
+}
+
+// Withdraw is a paid mutator transaction binding the contract method 0x9a493e75.
+//
+// Solidity: function withdraw(uint256 tokens, string blockchain_address, string network) returns(bool success)
+func (_Token *TokenSession) Withdraw(tokens *big.Int, blockchain_address string, network string) (*types.Transaction, error) {
+	return _Token.Contract.Withdraw(&_Token.TransactOpts, tokens, blockchain_address, network)
+}
+
+// Withdraw is a paid mutator transaction binding the contract method 0x9a493e75.
+//
+// Solidity: function withdraw(uint256 tokens, string blockchain_address, string network) returns(bool success)
+func (_Token *TokenTransactorSession) Withdraw(tokens *big.Int, blockchain_address string, network string) (*types.Transaction, error) {
+	return _Token.Contract.Withdraw(&_Token.TransactOpts, tokens, blockchain_address, network)
 }
 
 // Fallback is a paid mutator transaction binding the contract fallback function.
@@ -1057,149 +1031,6 @@ func (_Token *TokenFilterer) WatchMint(opts *bind.WatchOpts, sink chan<- *TokenM
 func (_Token *TokenFilterer) ParseMint(log types.Log) (*TokenMint, error) {
 	event := new(TokenMint)
 	if err := _Token.contract.UnpackLog(event, "Mint", log); err != nil {
-		return nil, err
-	}
-	return event, nil
-}
-
-// TokenRegisterWithdrawalAddressIterator is returned from FilterRegisterWithdrawalAddress and is used to iterate over the raw logs and unpacked data for RegisterWithdrawalAddress events raised by the Token contract.
-type TokenRegisterWithdrawalAddressIterator struct {
-	Event *TokenRegisterWithdrawalAddress // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *TokenRegisterWithdrawalAddressIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(TokenRegisterWithdrawalAddress)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(TokenRegisterWithdrawalAddress)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *TokenRegisterWithdrawalAddressIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *TokenRegisterWithdrawalAddressIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// TokenRegisterWithdrawalAddress represents a RegisterWithdrawalAddress event raised by the Token contract.
-type TokenRegisterWithdrawalAddress struct {
-	Addr common.Address
-	Raw  types.Log // Blockchain specific contextual infos
-}
-
-// FilterRegisterWithdrawalAddress is a free log retrieval operation binding the contract event 0x77bc19082a31daad021d73c26bb4f6e74100a41c98099405e92a9323d133e602.
-//
-// Solidity: event RegisterWithdrawalAddress(address indexed addr)
-func (_Token *TokenFilterer) FilterRegisterWithdrawalAddress(opts *bind.FilterOpts, addr []common.Address) (*TokenRegisterWithdrawalAddressIterator, error) {
-
-	var addrRule []interface{}
-	for _, addrItem := range addr {
-		addrRule = append(addrRule, addrItem)
-	}
-
-	logs, sub, err := _Token.contract.FilterLogs(opts, "RegisterWithdrawalAddress", addrRule)
-	if err != nil {
-		return nil, err
-	}
-	return &TokenRegisterWithdrawalAddressIterator{contract: _Token.contract, event: "RegisterWithdrawalAddress", logs: logs, sub: sub}, nil
-}
-
-// WatchRegisterWithdrawalAddress is a free log subscription operation binding the contract event 0x77bc19082a31daad021d73c26bb4f6e74100a41c98099405e92a9323d133e602.
-//
-// Solidity: event RegisterWithdrawalAddress(address indexed addr)
-func (_Token *TokenFilterer) WatchRegisterWithdrawalAddress(opts *bind.WatchOpts, sink chan<- *TokenRegisterWithdrawalAddress, addr []common.Address) (event.Subscription, error) {
-
-	var addrRule []interface{}
-	for _, addrItem := range addr {
-		addrRule = append(addrRule, addrItem)
-	}
-
-	logs, sub, err := _Token.contract.WatchLogs(opts, "RegisterWithdrawalAddress", addrRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(TokenRegisterWithdrawalAddress)
-				if err := _Token.contract.UnpackLog(event, "RegisterWithdrawalAddress", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseRegisterWithdrawalAddress is a log parse operation binding the contract event 0x77bc19082a31daad021d73c26bb4f6e74100a41c98099405e92a9323d133e602.
-//
-// Solidity: event RegisterWithdrawalAddress(address indexed addr)
-func (_Token *TokenFilterer) ParseRegisterWithdrawalAddress(log types.Log) (*TokenRegisterWithdrawalAddress, error) {
-	event := new(TokenRegisterWithdrawalAddress)
-	if err := _Token.contract.UnpackLog(event, "RegisterWithdrawalAddress", log); err != nil {
 		return nil, err
 	}
 	return event, nil
@@ -1712,39 +1543,59 @@ func (it *TokenWithdrawIterator) Close() error {
 
 // TokenWithdraw represents a Withdraw event raised by the Token contract.
 type TokenWithdraw struct {
-	Receiver common.Address
-	Tokens   *big.Int
-	Raw      types.Log // Blockchain specific contextual infos
+	Receiver          common.Address
+	Tokens            *big.Int
+	BlockchainAddress common.Hash
+	Network           common.Hash
+	Raw               types.Log // Blockchain specific contextual infos
 }
 
-// FilterWithdraw is a free log retrieval operation binding the contract event 0x884edad9ce6fa2440d8a54cc123490eb96d2768479d49ff9c7366125a9424364.
+// FilterWithdraw is a free log retrieval operation binding the contract event 0xbf4bee5506452a156854c54e249d6b04b0cd83287ba208202be81a4f87a55739.
 //
-// Solidity: event Withdraw(address indexed receiver, uint256 tokens)
-func (_Token *TokenFilterer) FilterWithdraw(opts *bind.FilterOpts, receiver []common.Address) (*TokenWithdrawIterator, error) {
+// Solidity: event Withdraw(address indexed receiver, uint256 tokens, string indexed blockchain_address, string indexed network)
+func (_Token *TokenFilterer) FilterWithdraw(opts *bind.FilterOpts, receiver []common.Address, blockchain_address []string, network []string) (*TokenWithdrawIterator, error) {
 
 	var receiverRule []interface{}
 	for _, receiverItem := range receiver {
 		receiverRule = append(receiverRule, receiverItem)
 	}
 
-	logs, sub, err := _Token.contract.FilterLogs(opts, "Withdraw", receiverRule)
+	var blockchain_addressRule []interface{}
+	for _, blockchain_addressItem := range blockchain_address {
+		blockchain_addressRule = append(blockchain_addressRule, blockchain_addressItem)
+	}
+	var networkRule []interface{}
+	for _, networkItem := range network {
+		networkRule = append(networkRule, networkItem)
+	}
+
+	logs, sub, err := _Token.contract.FilterLogs(opts, "Withdraw", receiverRule, blockchain_addressRule, networkRule)
 	if err != nil {
 		return nil, err
 	}
 	return &TokenWithdrawIterator{contract: _Token.contract, event: "Withdraw", logs: logs, sub: sub}, nil
 }
 
-// WatchWithdraw is a free log subscription operation binding the contract event 0x884edad9ce6fa2440d8a54cc123490eb96d2768479d49ff9c7366125a9424364.
+// WatchWithdraw is a free log subscription operation binding the contract event 0xbf4bee5506452a156854c54e249d6b04b0cd83287ba208202be81a4f87a55739.
 //
-// Solidity: event Withdraw(address indexed receiver, uint256 tokens)
-func (_Token *TokenFilterer) WatchWithdraw(opts *bind.WatchOpts, sink chan<- *TokenWithdraw, receiver []common.Address) (event.Subscription, error) {
+// Solidity: event Withdraw(address indexed receiver, uint256 tokens, string indexed blockchain_address, string indexed network)
+func (_Token *TokenFilterer) WatchWithdraw(opts *bind.WatchOpts, sink chan<- *TokenWithdraw, receiver []common.Address, blockchain_address []string, network []string) (event.Subscription, error) {
 
 	var receiverRule []interface{}
 	for _, receiverItem := range receiver {
 		receiverRule = append(receiverRule, receiverItem)
 	}
 
-	logs, sub, err := _Token.contract.WatchLogs(opts, "Withdraw", receiverRule)
+	var blockchain_addressRule []interface{}
+	for _, blockchain_addressItem := range blockchain_address {
+		blockchain_addressRule = append(blockchain_addressRule, blockchain_addressItem)
+	}
+	var networkRule []interface{}
+	for _, networkItem := range network {
+		networkRule = append(networkRule, networkItem)
+	}
+
+	logs, sub, err := _Token.contract.WatchLogs(opts, "Withdraw", receiverRule, blockchain_addressRule, networkRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1776,9 +1627,9 @@ func (_Token *TokenFilterer) WatchWithdraw(opts *bind.WatchOpts, sink chan<- *To
 	}), nil
 }
 
-// ParseWithdraw is a log parse operation binding the contract event 0x884edad9ce6fa2440d8a54cc123490eb96d2768479d49ff9c7366125a9424364.
+// ParseWithdraw is a log parse operation binding the contract event 0xbf4bee5506452a156854c54e249d6b04b0cd83287ba208202be81a4f87a55739.
 //
-// Solidity: event Withdraw(address indexed receiver, uint256 tokens)
+// Solidity: event Withdraw(address indexed receiver, uint256 tokens, string indexed blockchain_address, string indexed network)
 func (_Token *TokenFilterer) ParseWithdraw(log types.Log) (*TokenWithdraw, error) {
 	event := new(TokenWithdraw)
 	if err := _Token.contract.UnpackLog(event, "Withdraw", log); err != nil {

@@ -62,7 +62,7 @@ var ethNetworkConfigurations = map[string]NetworkConfiguration{
 		97,
 		"bsc-testnet",
 		GetTestnetGenesisBlock(),
-		common.HexToAddress("0x49E02993791d762EbD2E4ac2FcA80CbAD6029be0"),
+		common.HexToAddress("0xACFB6530F0a2454b651A65873a0C560b1D03B45F"),
 		BootstrapNodes,
 	},
 }

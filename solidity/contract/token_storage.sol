@@ -78,12 +78,12 @@ contract TokenStorage is Storage {
         setSymbol("TFT20");
         setName("TFT ERC20 representation");
 
-        // Use 9 decimals instead of 18, this way we have the same amount of decimals in both TFT and this Token
-        uint8 _decimals = 9;
+        // Use 7 decimals instead of 9, this way we have the same amount of decimals in both TFT and this Token
+        uint8 _decimals = 7;
         setDecimals(_decimals);
 
-        // Theoretically all TFT could be converted to this Token, so 100 billion total supply
-        uint _totalSupply = 100000000000 * 10 ** uint(_decimals);
+        // Theoretically all TFT could be converted to this Token, so 4 billion total supply
+        uint _totalSupply = 4000000000 * 10 ** uint(_decimals);
         setTotalSupply(_totalSupply);
     }
 }

@@ -88,31 +88,30 @@ func (bridge *Bridge) Start(cancel <-chan struct{}) error {
 	// subscribing to these events is not needed for operational purposes, but might be nice to get some info
 	go bridge.bridgeContract.SubscribeTransfers()
 	go bridge.bridgeContract.SubscribeMint()
-	go bridge.bridgeContract.SubscribeRegisterWithdrawAddress()
 
-	// withdrawChan := make(chan WithdrawEvent)
+	withdrawChan := make(chan WithdrawEvent)
+	go bridge.bridgeContract.SubscribeWithdraw(withdrawChan, 0)
 
-	// TODO
-	// go bridge.bridgeContract.SubscribeWithdraw(withdrawChan, 0)
 	go func() {
 		// txMap := make(map[erc20types.ERC20Hash]WithdrawEvent)
 		for {
 			select {
 			// // Remember new withdraws
-			// case we := <-withdrawChan:
-			// 	// Check if the withdraw is valid
-			// 	_, found, err := erc20Registry.GetTFTAddressForERC20Address(erc20types.ERC20Address(we.receiver))
-			// 	if err != nil {
-			// 		log.Error(fmt.Sprintf("Retrieving TFT address for registered ERC20 address %v errored: %v", we.receiver, err))
-			// 		continue
-			// 	}
-			// 	if !found {
-			// 		log.Error(fmt.Sprintf("Failed to retrieve TFT address for registered ERC20 Withdrawal address %v", we.receiver))
-			// 		continue
-			// 	}
-			// 	// remember the withdraw
-			// 	txMap[erc20types.ERC20Hash(we.txHash)] = we
-			// 	fmt.Println("Remembering withdraw event", "txHash", we.TxHash(), "height", we.BlockHeight())
+			case we := <-withdrawChan:
+				// // Check if the withdraw is valid
+				// _, found, err := erc20Registry.GetTFTAddressForERC20Address(erc20types.ERC20Address(we.receiver))
+				// if err != nil {
+				// 	log.Error(fmt.Sprintf("Retrieving TFT address for registered ERC20 address %v errored: %v", we.receiver, err))
+				// 	continue
+				// }
+				// if !found {
+				// 	log.Error(fmt.Sprintf("Failed to retrieve TFT address for registered ERC20 Withdrawal address %v", we.receiver))
+				// 	continue
+				// }
+				// // remember the withdraw
+				// txMap[erc20types.ERC20Hash(we.txHash)] = we
+				fmt.Println(we)
+				fmt.Println("Remembering withdraw event", "txHash", we.TxHash(), "height", we.BlockHeight())
 
 			// If we get a new head, check every withdraw we have to see if it has matured
 			case _ = <-heads:

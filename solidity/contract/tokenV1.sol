@@ -34,12 +34,10 @@ contract TTFT20 is OwnedUpgradeableTokenStorage {
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
-    // We have registered a new withdrawal address
-    event RegisterWithdrawalAddress(address indexed addr);
     // Lets mint some tokens, also index the TFT tx id
     event Mint(address indexed receiver, uint tokens, string indexed txid);
-    // Burn tokens in a withdrawal
-    event Withdraw(address indexed receiver, uint tokens);
+    // Burn tokens in a withdrawal, user chooses how much tokens
+    event Withdraw(address indexed receiver, uint tokens, string indexed blockchain_address, string indexed network);
 
     // name, symbol and decimals getters are optional per the ERC20 spec. Normally auto generated from public variables
     // but that is obviously not going to work for us
@@ -89,7 +87,6 @@ contract TTFT20 is OwnedUpgradeableTokenStorage {
         setBalance(msg.sender, getBalance(msg.sender).sub(tokens));
         setBalance(to, getBalance(to).add(tokens));
         emit Transfer(msg.sender, to, tokens);
-        _withdraw(to);
         return true;
     }
 
@@ -123,7 +120,16 @@ contract TTFT20 is OwnedUpgradeableTokenStorage {
         setBalance(from, getBalance(from).sub(tokens));
         setBalance(to, getBalance(to).add(tokens));
         emit Transfer(from, to, tokens);
-        _withdraw(to);
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Owner can withdraw and amount of tokens, these tokens will be burned.
+    // Owner must provide a network where tokens will be minted on the stellar side
+    // -----------------------------------------------------------------------
+    function withdraw(uint tokens, string memory blockchain_address, string memory network) public returns (bool success) {
+        setBalance(msg.sender, getBalance(msg.sender).sub(tokens));
+        emit Withdraw(msg.sender, tokens, blockchain_address, network);
         return true;
     }
 
@@ -154,44 +160,10 @@ contract TTFT20 is OwnedUpgradeableTokenStorage {
         _setMintID(txid);
         setBalance(receiver, getBalance(receiver).add(tokens));
         emit Mint(receiver, tokens, txid);
-        // Its possible we sent tokens to a withdrawal address, so try a withdraw
-        _withdraw(receiver);
-    }
-
-    // -----------------------------------------------------------------------
-    // Owner can register withdrawal addresses. Once the address is registered,
-    // a withdraw is attempted in case there might already be tokens on the
-    // address (might have been sent too soon, ...)
-    // -----------------------------------------------------------------------
-    function registerWithdrawalAddress(address addr) public onlyOwner {
-        // prevent double registration of withdrawal addresses
-        require(!_isWithdrawalAddress(addr), "Withdrawal address already registered");
-        _setWithdrawalAddress(addr);
-        emit RegisterWithdrawalAddress(addr);
-        // try to withdraw if anything is there
-        _withdraw(addr);
-    }
-
-    // -----------------------------------------------------------------------
-    // Views to check if a withdrawal address or mint tx IDis already known.
-    // -----------------------------------------------------------------------
-    function  isWithdrawalAddress(address _addr) public view returns (bool) {
-        return _isWithdrawalAddress(_addr);
     }
 
     function isMintID(string memory _txid) public view returns (bool) {
         return _isMintID(_txid);
-    }
-
-    // -----------------------------------------------------------------------
-    // Helper funcs for the eternal storage
-    // -----------------------------------------------------------------------
-    function _setWithdrawalAddress(address _addr) internal {
-        setBool(keccak256(abi.encode("address","withdrawal", _addr)), true);
-    }
-
-    function _isWithdrawalAddress(address _addr) internal view returns (bool) {
-        return getBool(keccak256(abi.encode("address","withdrawal", _addr)));
     }
 
     function _setMintID(string memory _txid) internal {
@@ -200,22 +172,5 @@ contract TTFT20 is OwnedUpgradeableTokenStorage {
 
     function _isMintID(string memory _txid) internal view returns (bool) {
         return getBool(keccak256(abi.encode("mint","transaction","id", _txid)));
-    }
-
-    // -----------------------------------------------------------------------
-    // Withdraw function
-    // Withdraw all funds on an account if there are enough, don't do anything
-    // otherwise. We assume the balance of the target address has already been
-    // updated by a transfer function prior to calling this.
-    // -----------------------------------------------------------------------
-    function _withdraw(address _addr) private {
-        // get current balance
-        uint _balance = getBalance(_addr);
-        if (_isWithdrawalAddress(_addr) && _canWithdraw(_balance)) {
-            // clear balance
-            setBalance(_addr, 0);
-            // emit the withdraw event
-            emit Withdraw(_addr, _balance);
-        }
     }
 }
