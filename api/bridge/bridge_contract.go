@@ -14,6 +14,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/stellar/go/clients/horizonclient"
+	hProtocol "github.com/stellar/go/protocols/horizon"
+	"github.com/stellar/go/protocols/horizon/effects"
+	"github.com/stellar/go/protocols/horizon/operations"
 
 	tfeth "github.com/threefoldtech/eth-bridge/api"
 	"github.com/threefoldtech/eth-bridge/api/bridge/contract"
@@ -36,6 +40,7 @@ const (
 // the bridge needs to use the bindings of the implementation contract, but the address of the proxy.
 type BridgeContract struct {
 	networkConfig tfeth.NetworkConfiguration // Ethereum network
+	networkName   string
 
 	lc *LightClient
 
@@ -75,7 +80,6 @@ func NewBridgeContract(networkName string, bootnodes []string, contractAddress s
 	}
 
 	bootstrapNodes, err := networkConfig.GetBootnodes(bootnodes)
-	log.Info("bootnodes", "nodes", bootstrapNodes)
 	if err != nil {
 		return nil, err
 	}
@@ -116,6 +120,7 @@ func NewBridgeContract(networkName string, bootnodes []string, contractAddress s
 	}
 
 	return &BridgeContract{
+		networkName:   networkName,
 		networkConfig: networkConfig,
 		lc:            lc,
 		filter:        filter,
@@ -171,6 +176,7 @@ func (bridge *BridgeContract) Refresh(head *types.Header) error {
 	if balance, err = bridge.lc.AccountBalanceAt(ctx, head.Number); err != nil {
 		return err
 	}
+	log.Debug(bridge.lc.account.account.Address.Hex())
 	// Everything succeeded, update the cached stats
 	bridge.lock.Lock()
 	bridge.head, bridge.balance = head, balance
@@ -182,7 +188,7 @@ func (bridge *BridgeContract) Refresh(head *types.Header) error {
 // Loop subscribes to new eth heads. If a new head is received, it is passed on the given channel,
 // after which the internal stats are updated if no update is already in progress
 func (bridge *BridgeContract) Loop(ch chan<- *types.Header) {
-	log.Info("Subscribing to eth headers")
+	log.Debug("Subscribing to eth headers")
 	// channel to receive head updates from client on
 	heads := make(chan *types.Header, 16)
 	// subscribe to head upates
@@ -230,7 +236,7 @@ func (bridge *BridgeContract) SubscribeTransfers() error {
 		case err = <-sub.Err():
 			return err
 		case transfer := <-sink:
-			log.Info("Noticed transfer event", "from", transfer.From, "to", transfer.To, "amount", transfer.Tokens)
+			log.Debug("Noticed transfer event", "from", transfer.From, "to", transfer.To, "amount", transfer.Tokens)
 		}
 	}
 }
@@ -318,7 +324,7 @@ func (bridge *BridgeContract) GetPastWithdraws(startHeight uint64, endHeight *ui
 // SubscribeWithdraw subscribes to new Withdraw events on the given contract. This call blocks
 // and prints out info about any withdraw as it happened
 func (bridge *BridgeContract) SubscribeWithdraw(wc chan<- WithdrawEvent, startHeight uint64) error {
-	log.Info("Subscribing to withdraw events", "start height", startHeight)
+	log.Debug("Subscribing to withdraw events", "start height", startHeight)
 	sink := make(chan *contract.TokenWithdraw)
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
 	pastWithdraws, err := bridge.GetPastWithdraws(startHeight, nil)
@@ -344,7 +350,7 @@ func (bridge *BridgeContract) SubscribeWithdraw(wc chan<- WithdrawEvent, startHe
 				// ignore removed events
 				continue
 			}
-			log.Info("Noticed withdraw event", "receiver", withdraw.Receiver, "amount", withdraw.Tokens)
+			log.Debug("Noticed withdraw event", "receiver", withdraw.Receiver, "amount", withdraw.Tokens)
 			wc <- WithdrawEvent{
 				receiver:    withdraw.Receiver,
 				amount:      withdraw.Tokens,
@@ -415,7 +421,7 @@ func (bridge *BridgeContract) SubscribeRegisterWithdrawAddress() error {
 		case err = <-sub.Err():
 			return err
 		case withdraw := <-sink:
-			log.Info("Noticed withdraw address registration event", "address", withdraw.Addr)
+			log.Debug("Noticed withdraw address registration event", "address", withdraw.Addr)
 		}
 	}
 }
@@ -459,7 +465,7 @@ func (bridge *BridgeContract) Mint(receiver ERC20Address, amount *big.Int, txID 
 }
 
 func (bridge *BridgeContract) mint(receiver ERC20Address, amount *big.Int, txID string) error {
-	log.Info("Calling mint function in contract")
+	log.Debug("Calling mint function in contract")
 	if amount == nil {
 		return errors.New("invalid amount")
 	}
@@ -467,12 +473,20 @@ func (bridge *BridgeContract) mint(receiver ERC20Address, amount *big.Int, txID 
 	if err != nil {
 		return err
 	}
+
+	// TODO estimate gas more correctly ..
+	gas, err := bridge.lc.SuggestGasPrice(context.Background())
+	if err != nil {
+		return err
+	}
+	newGas := big.NewInt(10 * gas.Int64())
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	opts := &bind.TransactOpts{
 		Context: ctx, From: accountAddress,
 		Signer: bridge.getSignerFunc(),
-		Value:  nil, Nonce: nil, GasLimit: 0, GasPrice: nil,
+		Value:  nil, Nonce: nil, GasLimit: 100000, GasPrice: newGas,
 	}
 	_, err = bridge.transactor.MintTokens(opts, common.Address(receiver), amount, txID)
 	return err
@@ -488,7 +502,7 @@ func (bridge *BridgeContract) IsMintTxID(txID string) (bool, error) {
 }
 
 func (bridge *BridgeContract) isMintTxID(txID string) (bool, error) {
-	log.Info("Calling isMintID")
+	log.Debug("Calling isMintID")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	opts := &bind.CallOpts{Context: ctx}
@@ -505,7 +519,7 @@ func (bridge *BridgeContract) RegisterWithdrawalAddress(address ERC20Address) er
 }
 
 func (bridge *BridgeContract) registerWithdrawalAddress(address ERC20Address) error {
-	log.Info("Calling register withdrawal address function in contract")
+	log.Debug("Calling register withdrawal address function in contract")
 	accountAddress, err := bridge.lc.AccountAddress()
 	if err != nil {
 		return err
@@ -531,7 +545,7 @@ func (bridge *BridgeContract) IsWithdrawalAddress(address ERC20Address) (bool, e
 }
 
 func (bridge *BridgeContract) isWithdrawalAddress(address ERC20Address) (bool, error) {
-	log.Info("Calling isWithdrawalAddress function in contract")
+	log.Debug("Calling isWithdrawalAddress function in contract")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	opts := &bind.CallOpts{Context: ctx}
@@ -553,7 +567,7 @@ func (bridge *BridgeContract) getSignerFunc() bind.SignerFn {
 }
 
 func (bridge *BridgeContract) TokenBalance(address common.Address) (*big.Int, error) {
-	log.Info("Calling TokenBalance function in contract")
+	log.Debug("Calling TokenBalance function in contract")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	opts := &bind.CallOpts{Context: ctx}
@@ -574,4 +588,59 @@ func bindTTFT20(address common.Address, caller bind.ContractCaller, transactor b
 		return nil, parsed, err
 	}
 	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), parsed, nil
+}
+
+// GetHorizonClient gets the horizon client based on the wallet's network
+func (b *BridgeContract) GetHorizonClient() (*horizonclient.Client, error) {
+	switch b.networkName {
+	case "smart-chain-testnet":
+		return horizonclient.DefaultTestNetClient, nil
+	case "main":
+		return horizonclient.DefaultPublicNetClient, nil
+	default:
+		return nil, errors.New("network is not supported")
+	}
+}
+
+func (b *BridgeContract) StreamStellarAccountPayments(ctx context.Context, accountID string, handler func(op operations.Operation)) error {
+	client, err := b.GetHorizonClient()
+	if err != nil {
+		return err
+	}
+
+	opRequest := horizonclient.OperationRequest{
+		ForAccount: accountID,
+	}
+
+	return client.StreamPayments(ctx, opRequest, handler)
+}
+
+func (b *BridgeContract) StreamStellarAccountTransactions(ctx context.Context, accountID string, handler func(op hProtocol.Transaction)) error {
+	client, err := b.GetHorizonClient()
+	if err != nil {
+		return err
+	}
+
+	opRequest := horizonclient.TransactionRequest{
+		ForAccount: accountID,
+	}
+
+	return client.StreamTransactions(ctx, opRequest, handler)
+}
+
+func (b *BridgeContract) GetTransactionEffects(txHash string) (effects effects.EffectsPage, err error) {
+	client, err := b.GetHorizonClient()
+	if err != nil {
+		return effects, err
+	}
+
+	effectsReq := horizonclient.EffectRequest{
+		ForTransaction: txHash,
+	}
+	effects, err = client.Effects(effectsReq)
+	if err != nil {
+		return effects, err
+	}
+
+	return effects, nil
 }
