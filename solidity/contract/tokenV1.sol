@@ -37,7 +37,7 @@ contract TTFT20 is OwnedUpgradeableTokenStorage {
     // Lets mint some tokens, also index the TFT tx id
     event Mint(address indexed receiver, uint tokens, string indexed txid);
     // Burn tokens in a withdrawal, user chooses how much tokens
-    event Withdraw(address indexed receiver, uint tokens, string indexed blockchain_address, string indexed network);
+    event Withdraw(address indexed receiver, uint tokens, string blockchain_address, string network);
 
     // name, symbol and decimals getters are optional per the ERC20 spec. Normally auto generated from public variables
     // but that is obviously not going to work for us

@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/stellar/go/clients/horizonclient"
+	"github.com/stellar/go/keypair"
 	hProtocol "github.com/stellar/go/protocols/horizon"
 	"github.com/stellar/go/protocols/horizon/effects"
 	"github.com/stellar/go/protocols/horizon/operations"
@@ -51,6 +52,8 @@ type BridgeContract struct {
 	contract *bind.BoundContract
 	abi      abi.ABI
 
+	wallet *stellarWallet
+
 	// cache some stats in case they might be usefull
 	head    *types.Header // Current head header of the bridge
 	balance *big.Int      // The current balance of the bridge (note: ethers only!)
@@ -66,7 +69,7 @@ func (bridge *BridgeContract) GetContractAdress() common.Address {
 }
 
 // NewBridgeContract creates a new wrapper for an allready deployed contract
-func NewBridgeContract(networkName string, bootnodes []string, contractAddress string, port int, accountJSON, accountPass string, datadir string, cancel <-chan struct{}) (*BridgeContract, error) {
+func NewBridgeContract(networkName string, bootnodes []string, contractAddress string, port int, accountJSON, accountPass string, datadir string, cancel <-chan struct{}, stellarNetwork string, stellarSeed string) (*BridgeContract, error) {
 	// load correct network config
 	networkConfig, err := tfeth.GetEthNetworkConfiguration(networkName)
 	if err != nil {
@@ -119,6 +122,17 @@ func NewBridgeContract(networkName string, bootnodes []string, contractAddress s
 		return nil, err
 	}
 
+	w := &stellarWallet{
+		network: stellarNetwork,
+	}
+
+	if stellarSeed != "" {
+		w.keypair, err = keypair.ParseFull(stellarSeed)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &BridgeContract{
 		networkName:   networkName,
 		networkConfig: networkConfig,
@@ -128,6 +142,7 @@ func NewBridgeContract(networkName string, bootnodes []string, contractAddress s
 		caller:        caller,
 		contract:      contract,
 		abi:           abi,
+		wallet:        w,
 	}, nil
 }
 
@@ -263,11 +278,14 @@ func (bridge *BridgeContract) SubscribeMint() error {
 
 // WithdrawEvent holds relevant information about a withdraw event
 type WithdrawEvent struct {
-	receiver    common.Address
-	amount      *big.Int
-	txHash      common.Hash
-	blockHash   common.Hash
-	blockHeight uint64
+	receiver           common.Address
+	amount             *big.Int
+	blockchain_address string
+	network            string
+	txHash             common.Hash
+	blockHash          common.Hash
+	blockHeight        uint64
+	raw                []byte
 }
 
 // Receiver of the withdraw
@@ -278,6 +296,16 @@ func (w WithdrawEvent) Receiver() common.Address {
 // Amount withdrawn
 func (w WithdrawEvent) Amount() *big.Int {
 	return w.amount
+}
+
+// Blockchain address to withdraw to
+func (w WithdrawEvent) BlockchainAddress() string {
+	return w.blockchain_address
+}
+
+// Network to withdraw to
+func (w WithdrawEvent) Network() string {
+	return w.network
 }
 
 // TxHash hash of the transaction
@@ -312,17 +340,21 @@ func (bridge *BridgeContract) SubscribeWithdraw(wc chan<- WithdrawEvent, startHe
 		case err = <-sub.Err():
 			return err
 		case withdraw := <-sink:
+
 			if withdraw.Raw.Removed {
 				// ignore removed events
 				continue
 			}
 			log.Debug("Noticed withdraw event", "receiver", withdraw.Receiver, "amount", withdraw.Tokens)
 			wc <- WithdrawEvent{
-				receiver:    withdraw.Receiver,
-				amount:      withdraw.Tokens,
-				txHash:      withdraw.Raw.TxHash,
-				blockHash:   withdraw.Raw.BlockHash,
-				blockHeight: withdraw.Raw.BlockNumber,
+				receiver:           withdraw.Receiver,
+				amount:             withdraw.Tokens,
+				txHash:             withdraw.Raw.TxHash,
+				blockHash:          withdraw.Raw.BlockHash,
+				blockHeight:        withdraw.Raw.BlockNumber,
+				blockchain_address: withdraw.BlockchainAddress,
+				network:            withdraw.Network,
+				raw:                withdraw.Raw.Data,
 			}
 		}
 	}

@@ -18,9 +18,6 @@ import (
 )
 
 const (
-	// TFTBlockDelay is the amount of blocks to wait before
-	// pushing tft transactions to the ethereum contract
-	TFTBlockDelay = 6
 	// EthBlockDelay is the amount of blocks to wait before
 	// pushing eth transaction to the tfchain network
 	EthBlockDelay = 30
@@ -34,8 +31,8 @@ type Bridge struct {
 }
 
 // NewBridge creates a new Bridge.
-func NewBridge(ethPort uint16, accountJSON, accountPass string, ethNetworkName string, bootnodes []string, contractAddress string, datadir string, cancel <-chan struct{}) (*Bridge, error) {
-	contract, err := NewBridgeContract(ethNetworkName, bootnodes, contractAddress, int(ethPort), accountJSON, accountPass, filepath.Join(datadir, "eth"), cancel)
+func NewBridge(ethPort uint16, accountJSON, accountPass string, ethNetworkName string, bootnodes []string, contractAddress string, datadir string, cancel <-chan struct{}, stellarNetwork string, stellarSeed string) (*Bridge, error) {
+	contract, err := NewBridgeContract(ethNetworkName, bootnodes, contractAddress, int(ethPort), accountJSON, accountPass, filepath.Join(datadir, "eth"), cancel, stellarNetwork, stellarSeed)
 	if err != nil {
 		return nil, err
 	}
@@ -93,87 +90,30 @@ func (bridge *Bridge) Start(cancel <-chan struct{}) error {
 	go bridge.bridgeContract.SubscribeWithdraw(withdrawChan, 0)
 
 	go func() {
-		// txMap := make(map[erc20types.ERC20Hash]WithdrawEvent)
+		txMap := make(map[string]WithdrawEvent)
 		for {
 			select {
 			// // Remember new withdraws
 			case we := <-withdrawChan:
-				// // Check if the withdraw is valid
-				// _, found, err := erc20Registry.GetTFTAddressForERC20Address(erc20types.ERC20Address(we.receiver))
-				// if err != nil {
-				// 	log.Error(fmt.Sprintf("Retrieving TFT address for registered ERC20 address %v errored: %v", we.receiver, err))
-				// 	continue
-				// }
-				// if !found {
-				// 	log.Error(fmt.Sprintf("Failed to retrieve TFT address for registered ERC20 Withdrawal address %v", we.receiver))
-				// 	continue
-				// }
-				// // remember the withdraw
-				// txMap[erc20types.ERC20Hash(we.txHash)] = we
-				fmt.Println(we)
-				fmt.Println("Remembering withdraw event", "txHash", we.TxHash(), "height", we.BlockHeight())
-
+				log.Info("Remembering withdraw event", "txHash", we.TxHash(), "height", we.BlockHeight())
+				txMap[we.txHash.String()] = we
 			// If we get a new head, check every withdraw we have to see if it has matured
-			case _ = <-heads:
-				// fmt.Println(head.Number)
+			case head := <-heads:
+				bridge.mut.Lock()
+				for id := range txMap {
+					we := txMap[id]
+					if head.Number.Uint64() >= we.blockHeight+1 {
+						log.Info("Attempting to create an ERC20 withdraw tx", "ethTx", we.TxHash())
 
-				// cl := bridge.GetClient()
-				// fmt.Println(cl.lesc.Downloader().Progress())
-				// p, _ := cl.PendingTransactionCount(context.Background())
-
-				// fmt.Println(p)
-				// p, err := bridge.bridgeContract.lc.SyncProgress(context.Background())
-				// if err != nil {
-				// 	fmt.Println(err)
-				// }
-				// fmt.Println(p)
-
-				// b, err := bridge.bridgeContract.lc.BalanceAt(context.Background(), common.HexToAddress("0xbD330A6F55518b5dc6B984c01dd7f023775fbe7d"), head.Number)
-				// if err != nil {
-				// 	fmt.Println(err)
-				// }
-
-				// fmt.Println(b)
-				// bridge.mut.Lock()
-				// for id := range txMap {
-				// 	we := txMap[id]
-				// 	if head.Number.Uint64() >= we.blockHeight+EthBlockDelay {
-				// 		fmt.Println("Attempting to create an ERC20 withdraw tx", "ethTx", we.TxHash())
-				// 		// we waited long enough, create transaction and push it
-				// 		uh, found, err := erc20Registry.GetTFTAddressForERC20Address(erc20types.ERC20Address(we.receiver))
-				// 		if err != nil {
-				// 			log.Error(fmt.Sprintf("Retrieving TFT address for registered ERC20 address %v errored: %v", we.receiver, err))
-				// 			continue
-				// 		}
-				// 		if !found {
-				// 			log.Error(fmt.Sprintf("Failed to retrieve TFT address for registered ERC20 Withdrawal address %v", we.receiver))
-				// 			continue
-				// 		}
-
-				// 		tx := erc20types.ERC20CoinCreationTransaction{}
-				// 		tx.Address = uh
-
-				// 		// define the txFee
-				// 		tx.TransactionFee = bridge.chainCts.MinimumTransactionFee
-
-				// 		// define the value, which is the value withdrawn minus the fees
-				// 		tx.Value = types.NewCurrency(we.amount).Sub(tx.TransactionFee)
-
-				// 		// fill in the other info
-				// 		tx.TransactionID = erc20types.ERC20Hash(we.txHash)
-				// 		tx.BlockID = erc20types.ERC20Hash(we.blockHash)
-
-				// 		if err := bridge.commitWithdrawTransaction(tx); err != nil {
-				// 			log.Error("Failed to create ERC20 Withdraw transaction", "err", err)
-				// 			continue
-				// 		}
-
-				// 		fmt.Println("Created ERC20 -> TFT transaction", "txid", tx.Transaction(bridge.txVersions.ERC20CoinCreation).ID())
-
-				// 		// forget about our tx
-				// 		delete(txMap, id)
-				// 	}
-				// }
+						err := bridge.bridgeContract.wallet.CreateAndSubmitPayment(we.blockchain_address, we.amount.Uint64())
+						if err != nil {
+							log.Error(fmt.Sprintf("failed to create payment for withdrawal to %s", we.blockchain_address), err.Error())
+							continue
+						}
+						// forget about our tx
+						delete(txMap, id)
+					}
+				}
 
 				// bridge.persist.EthHeight = head.Number.Uint64() - EthBlockDelay
 				// // Check for underflow
@@ -184,7 +124,7 @@ func (bridge *Bridge) Start(cancel <-chan struct{}) error {
 				// 	log.Error("Failed to save bridge persistency", "err", err)
 				// }
 
-				// bridge.mut.Unlock()
+				bridge.mut.Unlock()
 			}
 		}
 	}()

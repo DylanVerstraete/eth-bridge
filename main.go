@@ -35,7 +35,10 @@ func main() {
 
 	cnl := make(chan struct{})
 
-	br, err := bridge.NewBridge(6969, "/home/dylan/.ethereum/keystore/UTC--2021-04-01T14-12-23.149949737Z--bd330a6f55518b5dc6b984c01dd7f023775fbe7d", "test123", "smart-chain-testnet", nil, "", "./storage", cnl)
+	stellarNetwork := "testnet"
+	stellarSeed := "SBSFQCNRZMBPZ7RFLTYK3CGQTAXZEURXISROLKL4RCIRICUO6JXWTQEO"
+
+	br, err := bridge.NewBridge(6969, "/home/dylan/.ethereum/keystore/UTC--2021-04-01T14-12-23.149949737Z--bd330a6f55518b5dc6b984c01dd7f023775fbe7d", "test123", "smart-chain-testnet", nil, "", "./storage", cnl, stellarNetwork, stellarSeed)
 	if err != nil {
 		panic(err)
 	}

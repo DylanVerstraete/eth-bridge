@@ -135,13 +135,13 @@
 				"type": "uint256"
 			},
 			{
-				"indexed": true,
+				"indexed": false,
 				"internalType": "string",
 				"name": "blockchain_address",
 				"type": "string"
 			},
 			{
-				"indexed": true,
+				"indexed": false,
 				"internalType": "string",
 				"name": "network",
 				"type": "string"
